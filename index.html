@@ -4,91 +4,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
 <title>Security Incident Desk</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f1f5f9;color:#172033;margin:0;line-height:1.6}
-header{background:#14243a;color:white;padding:24px 18px}
-header h1{margin:0;font-size:26px}
-header p{color:#d5e4f5}
-main{max-width:850px;margin:24px auto;padding:0 14px}
-section{background:white;padding:20px;margin-bottom:18px;border-radius:12px;box-shadow:0 2px 8px #0001}
-h2{font-size:20px;margin-top:0}
-label{display:block;font-weight:bold;margin:12px 0 5px}
-textarea,input{box-sizing:border-box;width:100%;padding:12px;border:1px solid #bcc8d6;border-radius:7px;font:inherit}
-textarea{min-height:130px}
-button{background:#175cd3;color:white;border:0;border-radius:7px;padding:11px 15px;margin:10px 6px 0 0;font-weight:bold}
-.output{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef3f8;padding:12px;border-radius:7px}
-.small{font-size:13px;color:#536276}
+:root{color-scheme:dark;--bg:#080e19;--panel:#111b2b;--line:#26364d;--text:#edf4ff;--muted:#9aabc2;--cyan:#57d5e7;--green:#67e8b1;--amber:#ffd27a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:25px 18px;background:linear-gradient(135deg,#122743,#101827);border-bottom:1px solid var(--line)}
+.wrap{max-width:1050px;margin:auto}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:45px;height:45px;border-radius:13px;background:#173c50;display:grid;place-items:center;font-size:25px}
+h1{font-size:clamp(23px,5vw,34px);line-height:1.2;margin:0}
+h2{font-size:19px;margin:0 0 8px}
+h3{font-size:15px;margin:0 0 8px}
+p{margin:7px 0;color:var(--muted)}
+.sub{margin-top:8px;max-width:680px}
+.status{display:inline-flex;align-items:center;gap:8px;color:var(--green);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-top:18px}
+.dot{width:8px;height:8px;background:var(--green);border-radius:50%}
+main{max-width:1050px;margin:auto;padding:22px 16px 45px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px}
+.stat span{display:block;color:var(--muted);font-size:12px}
+.stat strong{display:block;font-size:21px;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.panel{margin-bottom:16px}
+.eyebrow{color:var(--cyan);font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;margin-bottom:5px}
+label{display:block;font-weight:600;font-size:13px;margin:13px 0 5px}
+input,textarea,select{width:100%;background:#091321;color:var(--text);border:1px solid #354760;border-radius:9px;padding:11px;font:inherit}
+textarea{min-height:125px;resize:vertical}
+button{border:0;border-radius:9px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer;margin:10px 6px 0 0}
+.primary{background:var(--cyan);color:#06131c}
+.secondary{background:#25364b;color:var(--text);border:1px solid #3a4e68}
+.result{white-space:pre-wrap;overflow-wrap:anywhere;background:#091321;border:1px solid var(--line);padding:12px;border-radius:9px;margin-top:12px;color:#d8e6f8;font-size:13px}
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.check input{width:18px;min-width:18px;margin-top:4px;accent-color:var(--cyan)}
+.check label{font-weight:400;margin:0}
+.notice{border-left:3px solid var(--amber);padding:10px 13px;background:#211d15;border-radius:5px;color:#f5dfb5;font-size:13px;margin-top:12px}
+footer{border-top:1px solid var(--line);padding:22px 16px;text-align:center;color:var(--muted);font-size:12px}
+.small{font-size:12px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.stats{gap:8px}.stat{padding:12px 9px}.stat strong{font-size:17px}.stat span{font-size:11px}}
 </style>
 </head>
 <body>
 <header>
-<h1>Security Incident Desk</h1>
-<p>A practical workspace for documenting suspicious messages and preserving evidence.</p>
+ <div class="wrap">
+  <div class="brand"><div class="logo">🛡️</div><div><h1>Security Incident Desk</h1><p>Incident response workspace</p></div></div>
+  <p class="sub">Document suspicious messages, organize evidence, and prepare clear incident reports in one place.</p>
+  <div class="status"><span class="dot"></span> Local workspace · No account required</div>
+ </div>
 </header>
 <main>
-<section>
-<h2>Incident checklist</h2>
-<ul>
-<li>Preserve the original email or message.</li>
-<li>Record when and where it was received.</li>
-<li>Do not click suspicious links or open unexpected attachments.</li>
-<li>Verify the sender through a trusted, independent channel.</li>
-<li>Redact passwords, tokens, and personal information before sharing evidence.</li>
-</ul>
-</section>
-<section>
-<h2>Email header analyzer</h2>
-<p>Paste raw email headers below. Analysis happens in your browser; this tool does not verify whether a message is genuine.</p>
-<label for="headers">Raw email headers</label>
-<textarea id="headers" placeholder="Paste email headers here..."></textarea>
-<button onclick="analyze()">Analyze headers</button>
-<button onclick="document.getElementById('headers').value='';document.getElementById('results').textContent=''">Clear</button>
-<div id="results" class="output" aria-live="polite">Analysis results will appear here.</div>
-</section>
-<section>
-<h2>Incident notes</h2>
-<label for="date">Date and time observed</label>
-<input id="date" placeholder="Enter date and time">
-<label for="summary">Incident summary</label>
-<textarea id="summary" placeholder="Describe what happened. Avoid passwords and unnecessary personal data."></textarea>
-<label for="actions">Actions taken</label>
-<textarea id="actions" placeholder="Record verification, reporting, and evidence preservation steps."></textarea>
-<button onclick="downloadNotes()">Download incident notes</button>
-<p class="small">Notes stay in this page until you leave or refresh. Download them if you need a copy.</p>
-</section>
-<section>
-<h2>Privacy and limitations</h2>
-<p>This static website does not identify visitors, collect their IP addresses, or run server-side access logging. Email header results may be incomplete or forged. Treat them as clues, not proof.</p>
-<p>Only collect or share evidence you are authorized to handle. Keep original evidence secure and restrict access to sensitive incident records.</p>
-</section>
+ <section class="stats">
+  <div class="stat"><span>WORKSPACE</span><strong>Ready</strong></div>
+  <div class="stat"><span>HEADER CHECKS</span><strong>On-device</strong></div>
+  <div class="stat"><span>REPORT STORAGE</span><strong>Your device</strong></div>
+ </section>
+
+ <section class="grid">
+  <div class="panel">
+   <div class="eyebrow">01 · Response</div><h2>Incident checklist</h2>
+   <p>Work through these steps when investigating a suspicious message.</p>
+   <div class="check"><input type="checkbox" id="c1"><label for="c1">Preserve the original message and full email headers.</label></div>
+   <div class="check"><input type="checkbox" id="c2"><label for="c2">Avoid clicking links or opening unexpected attachments.</label></div>
+   <div class="check"><input type="checkbox" id="c3"><label for="c3">Verify the sender through a trusted, separate channel.</label></div>
+   <div class="check"><input type="checkbox" id="c4"><label for="c4">Record dates, times, and actions taken.</label></div>
+   <div class="check"><input type="checkbox" id="c5"><label for="c5">Report the incident to the appropriate security team.</label></div>
+   <button class="secondary" onclick="resetChecks()">Reset checklist</button>
+  </div>
+
+  <div class="panel">
+   <div class="eyebrow">02 · Email forensics</div><h2>Email header analyzer</h2>
+   <p>Paste raw email headers below. Remove personal information first if it is not needed.</p>
+   <label for="headers">Full email headers</label>
+   <textarea id="headers" placeholder="From: sender@example.com&#10;Reply-To: other@example.com&#10;Authentication-Results: ..."></textarea>
+   <button class="primary" onclick="analyzeHeaders()">Analyze headers</button>
+   <button class="secondary" onclick="clearHeaders()">Clear</button>
+   <div id="analysisResult" class="result" aria-live="polite">Analysis results will appear here. This tool examines text only; it does not verify the sender.</div>
+  </div>
+ </section>
+
+ <section class="panel">
+  <div class="eyebrow">03 · Case management</div><h2>Incident report builder</h2>
+  <p>Complete a report and download a text copy to your device.</p>
+  <div class="grid">
+   <div><label for="caseid">Case reference (optional)</label><input id="caseid" placeholder="e.g. INC-2026-001"></div>
+   <div><label for="incidentDate">Date and time</label><input id="incidentDate" type="datetime-local"></div>
+   <div><label for="category">Incident type</label><select id="category"><option>Suspicious email</option><option>Phishing link</option><option>Impersonation</option><option>Malware concern</option><option>Unauthorized access</option><option>Other</option></select></div>
+   <div><label for="priority">Priority</label><select id="priority"><option>Undetermined</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+  </div>
+  <label for="summary">Incident summary</label><textarea id="summary" placeholder="What happened? Include relevant facts without guessing."></textarea>
+  <label for="evidence">Evidence and source details</label><textarea id="evidence" placeholder="Where was it received? Which evidence was preserved? Avoid unnecessary sensitive data."></textarea>
+  <label for="actions">Actions taken and next steps</label><textarea id="actions" placeholder="Record steps taken, people notified, and follow-up actions."></textarea>
+  <button class="primary" onclick="downloadReport()">Download incident report</button>
+  <button class="secondary" onclick="clearReport()">Clear report form</button>
+  <p class="small">The report is generated in your browser and downloaded as a text file. This page does not send it to a server.</p>
+ </section>
+
+ <section class="panel">
+  <div class="eyebrow">04 · Privacy & limitations</div><h2>Use evidence responsibly</h2>
+  <p>This is a static website. It does not provide server-side visitor logs, determine a visitor's identity, or reliably identify an IP address, region, or internet provider.</p>
+  <p>Email headers can be incomplete or forged. Authentication results pasted here are text supplied by the user, not an independent SPF, DKIM, or DMARC verification.</p>
+  <div class="notice">Use this workspace only for incidents you are authorized to investigate. Protect personal information, preserve original evidence, and follow your organization's policies and applicable law.</div>
+ </section>
 </main>
+<footer>Security Incident Desk · Browser-based tools · Handle all evidence with care</footer>
 <script>
-function analyze(){
-const raw=document.getElementById('headers').value;
-const wanted=['From','To','Reply-To','Return-Path','Subject','Date','Message-ID','Received','Authentication-Results'];
-const lines=raw.replace(/\r\n[ \t]/g,' ').split(/\r?\n/);
-const found={};
-let current='';
-for(const line of lines){
-if(/^[ \t]/.test(line)&&current){found[current]+=' '+line.trim();continue;}
-const m=line.match(/^([A-Za-z0-9-]+):\s*(.*)$/);
-if(m){current=m[1];found[current]=(found[current]?found[current]+'\n':'')+m[2];}
+function analyzeHeaders(){
+ const raw=document.getElementById('headers').value.trim();
+ const out=document.getElementById('analysisResult');
+ if(!raw){out.textContent='Paste email headers first.';return;}
+ const wanted=['From','To','Reply-To','Return-Path','Subject','Date','Message-ID','Authentication-Results'];
+ const lines=raw.replace(/\r\n[ \t]+/g,' ').split(/\r?\n/);
+ const found={};
+ let received=0;
+ for(const line of lines){
+  const m=line.match(/^([^:]+):\s*(.*)$/);
+  if(!m)continue;
+  const key=m[1].trim();
+  const value=m[2].trim();
+  const lower=key.toLowerCase();
+  if(lower==='received')received++;
+  const match=wanted.find(x=>x.toLowerCase()===lower);
+  if(match&&!found[match])found[match]=value;
+  if(lower==='authentication-results'&&found['Authentication-Results'])found['Authentication-Results']+=' | '+value;
+ }
+ const output=[];
+ output.push('HEADER REVIEW — NOT A VERIFICATION');
+ for(const key of wanted)output.push(key+': '+(found[key]||'Not found'));
+ output.push('Received fields: '+received);
+ if(found.From&&found['Reply-To']&&found.From.toLowerCase()!==found['Reply-To'].toLowerCase()){
+  output.push('REVIEW CLUE: From and Reply-To differ. This can be legitimate, but verify independently.');
+ }
+ if(!found['Authentication-Results'])output.push('REVIEW CLUE: No Authentication-Results field was found in the pasted text.');
+ if(received===0)output.push('REVIEW CLUE: No Received fields were found in the pasted text.');
+ output.push('Reminder: fields can be forged or omitted. Confirm authentication with trusted mail-system logs or your mail administrator.');
+ out.textContent=output.join('\n');
 }
-let out='Extracted fields (not independently verified):\n\n';
-for(const key of wanted){
-const vals=Object.keys(found).filter(k=>k.toLowerCase()===key.toLowerCase());
-if(vals.length)out+=key+':\n'+vals.map(k=>found[k]).join('\n')+'\n\n';
+function clearHeaders(){
+ document.getElementById('headers').value='';
+ document.getElementById('analysisResult').textContent='Analysis results will appear here. This tool examines text only; it does not verify the sender.';
 }
-if(!raw.trim())out='Paste email headers first.';
-else if(out==='Extracted fields (not independently verified):\n\n')out+='No recognized header fields found.';
-document.getElementById('results').textContent=out;
+function resetChecks(){document.querySelectorAll('.check input').forEach(x=>x.checked=false);}
+function val(id){return document.getElementById(id).value.trim();}
+function downloadReport(){
+ const fields=[
+ ['Case reference',val('caseid')||'Not provided'],
+ ['Date and time',val('incidentDate')||'Not provided'],
+ ['Incident type',val('category')],
+ ['Priority',val('priority')],
+ ['Incident summary',val('summary')||'Not provided'],
+ ['Evidence and source details',val('evidence')||'Not provided'],
+ ['Actions taken and next steps',val('actions')||'Not provided']
+ ];
+ const content='SECURITY INCIDENT REPORT\n'+'='.repeat(28)+'\n\n'+fields.map(([k,v])=>k+':\n'+v).join('\n\n')+'\n\nGenerated locally in the browser. Review before sharing.\n';
+ const blob=new Blob([content],{type:'text/plain;charset=utf-8'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;a.download='security-incident-report.txt';
+ document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
-function downloadNotes(){
-const content='SECURITY INCIDENT NOTES\n\nDate/time: '+document.getElementById('date').value+'\n\nSummary:\n'+document.getElementById('summary').value+'\n\nActions taken:\n'+document.getElementById('actions').value+'\n';
-const a=document.createElement('a');
-a.href=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));
-a.download='incident-notes.txt';a.click();URL.revokeObjectURL(a.href);
+function clearReport(){
+ ['caseid','incidentDate','summary','evidence','actions'].forEach(id=>document.getElementById(id).value='');
+ document.getElementById('category').selectedIndex=0;
+ document.getElementById('priority').selectedIndex=0;
 }
 </script>
 </body>
