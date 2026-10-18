@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Incident Desk</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f1f5f9;color:#172033;margin:0;line-height:1.6}
+header{background:#14243a;color:white;padding:24px 18px}
+header h1{margin:0;font-size:26px}
+header p{color:#d5e4f5}
+main{max-width:850px;margin:24px auto;padding:0 14px}
+section{background:white;padding:20px;margin-bottom:18px;border-radius:12px;box-shadow:0 2px 8px #0001}
+h2{font-size:20px;margin-top:0}
+label{display:block;font-weight:bold;margin:12px 0 5px}
+textarea,input{box-sizing:border-box;width:100%;padding:12px;border:1px solid #bcc8d6;border-radius:7px;font:inherit}
+textarea{min-height:130px}
+button{background:#175cd3;color:white;border:0;border-radius:7px;padding:11px 15px;margin:10px 6px 0 0;font-weight:bold}
+.output{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef3f8;padding:12px;border-radius:7px}
+.small{font-size:13px;color:#536276}
+</style>
+</head>
+<body>
+<header>
+<h1>Security Incident Desk</h1>
+<p>A practical workspace for documenting suspicious messages and preserving evidence.</p>
+</header>
+<main>
+<section>
+<h2>Incident checklist</h2>
+<ul>
+<li>Preserve the original email or message.</li>
+<li>Record when and where it was received.</li>
+<li>Do not click suspicious links or open unexpected attachments.</li>
+<li>Verify the sender through a trusted, independent channel.</li>
+<li>Redact passwords, tokens, and personal information before sharing evidence.</li>
+</ul>
+</section>
+<section>
+<h2>Email header analyzer</h2>
+<p>Paste raw email headers below. Analysis happens in your browser; this tool does not verify whether a message is genuine.</p>
+<label for="headers">Raw email headers</label>
+<textarea id="headers" placeholder="Paste email headers here..."></textarea>
+<button onclick="analyze()">Analyze headers</button>
+<button onclick="document.getElementById('headers').value='';document.getElementById('results').textContent=''">Clear</button>
+<div id="results" class="output" aria-live="polite">Analysis results will appear here.</div>
+</section>
+<section>
+<h2>Incident notes</h2>
+<label for="date">Date and time observed</label>
+<input id="date" placeholder="Enter date and time">
+<label for="summary">Incident summary</label>
+<textarea id="summary" placeholder="Describe what happened. Avoid passwords and unnecessary personal data."></textarea>
+<label for="actions">Actions taken</label>
+<textarea id="actions" placeholder="Record verification, reporting, and evidence preservation steps."></textarea>
+<button onclick="downloadNotes()">Download incident notes</button>
+<p class="small">Notes stay in this page until you leave or refresh. Download them if you need a copy.</p>
+</section>
+<section>
+<h2>Privacy and limitations</h2>
+<p>This static website does not identify visitors, collect their IP addresses, or run server-side access logging. Email header results may be incomplete or forged. Treat them as clues, not proof.</p>
+<p>Only collect or share evidence you are authorized to handle. Keep original evidence secure and restrict access to sensitive incident records.</p>
+</section>
+</main>
+<script>
+function analyze(){
+const raw=document.getElementById('headers').value;
+const wanted=['From','To','Reply-To','Return-Path','Subject','Date','Message-ID','Received','Authentication-Results'];
+const lines=raw.replace(/\r\n[ \t]/g,' ').split(/\r?\n/);
+const found={};
+let current='';
+for(const line of lines){
+if(/^[ \t]/.test(line)&&current){found[current]+=' '+line.trim();continue;}
+const m=line.match(/^([A-Za-z0-9-]+):\s*(.*)$/);
+if(m){current=m[1];found[current]=(found[current]?found[current]+'\n':'')+m[2];}
+}
+let out='Extracted fields (not independently verified):\n\n';
+for(const key of wanted){
+const vals=Object.keys(found).filter(k=>k.toLowerCase()===key.toLowerCase());
+if(vals.length)out+=key+':\n'+vals.map(k=>found[k]).join('\n')+'\n\n';
+}
+if(!raw.trim())out='Paste email headers first.';
+else if(out==='Extracted fields (not independently verified):\n\n')out+='No recognized header fields found.';
+document.getElementById('results').textContent=out;
+}
+function downloadNotes(){
+const content='SECURITY INCIDENT NOTES\n\nDate/time: '+document.getElementById('date').value+'\n\nSummary:\n'+document.getElementById('summary').value+'\n\nActions taken:\n'+document.getElementById('actions').value+'\n';
+const a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));
+a.download='incident-notes.txt';a.click();URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
