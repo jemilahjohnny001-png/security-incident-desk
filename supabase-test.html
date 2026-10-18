@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Supabase Connection Test</title>
+  <title>Security Incident Desk - Connection Test</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
@@ -22,7 +22,6 @@
       border-radius: 12px;
       box-shadow: 0 4px 16px #0001;
     }
-    h1 { font-size: 24px; }
     input, button {
       box-sizing: border-box;
       width: 100%;
@@ -48,7 +47,7 @@
   <h1>Security Incident Desk</h1>
   <p>Supabase connection and sign-in test</p>
 
-  <p id="status">Add your publishable key in the code, then reload this page.</p>
+  <p id="status">Checking configuration...</p>
 
   <label for="email">Email address</label>
   <input id="email" type="email" placeholder="Your account email">
@@ -65,15 +64,18 @@
     "https://leodtboncrsvugugqjea.supabase.co";
 
   const SUPABASE_PUBLISHABLE_KEY =
-    "YOUR_PUBLISHABLE_KEY_HERE";
+    "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
   const statusBox = document.getElementById("status");
 
   if (SUPABASE_PUBLISHABLE_KEY === "sb_publishable_iIhv7iCli8S230Mb6tqzng_IK4focdp") {
     statusBox.textContent =
-      "Setup needed: replace YOUR_PUBLISHABLE_KEY_HERE with your Supabase publishable key.";
+      "Setup needed: replace the publishable-key placeholder in the code.";
+  } else if (!window.supabase) {
+    statusBox.textContent =
+      "Could not load Supabase. Check your internet connection and reload.";
   } else {
-    const client = supabase.createClient(
+    const client = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY
     );
@@ -85,6 +87,11 @@
 
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        statusBox.textContent = "Enter your email and password first.";
+        return;
+      }
 
       const { data, error } = await client.auth.signInWithPassword({
         email,
@@ -106,3 +113,4 @@
 </script>
 </body>
 </html>
+
