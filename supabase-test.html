@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supabase Connection Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172554;
+      margin: 0;
+      padding: 24px;
+    }
+    main {
+      max-width: 480px;
+      margin: 40px auto;
+      padding: 24px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px #0001;
+    }
+    h1 { font-size: 24px; }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    button {
+      background: #1e3a8a;
+      color: white;
+      border: 0;
+      border-radius: 6px;
+    }
+    #status {
+      padding: 12px;
+      background: #eff6ff;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Security Incident Desk</h1>
+  <p>Supabase connection and sign-in test</p>
+
+  <p id="status">Add your publishable key in the code, then reload this page.</p>
+
+  <label for="email">Email address</label>
+  <input id="email" type="email" placeholder="Your account email">
+
+  <label for="password">Password</label>
+  <input id="password" type="password" placeholder="Your account password">
+
+  <button id="login">Sign in</button>
+  <button id="logout">Sign out</button>
+</main>
+
+<script>
+  const SUPABASE_URL =
+    "https://leodtboncrsvugugqjea.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "YOUR_PUBLISHABLE_KEY_HERE";
+
+  const statusBox = document.getElementById("status");
+
+  if (SUPABASE_PUBLISHABLE_KEY === "YOUR_PUBLISHABLE_KEY_HERE") {
+    statusBox.textContent =
+      "Setup needed: replace YOUR_PUBLISHABLE_KEY_HERE with your Supabase publishable key.";
+  } else {
+    const client = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    statusBox.textContent = "Supabase client initialized.";
+
+    document.getElementById("login").onclick = async () => {
+      statusBox.textContent = "Signing in...";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      const { data, error } = await client.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      statusBox.textContent = error
+        ? "Sign-in failed: " + error.message
+        : "Signed in successfully as " + data.user.email;
+    };
+
+    document.getElementById("logout").onclick = async () => {
+      const { error } = await client.auth.signOut();
+      statusBox.textContent = error
+        ? "Sign-out failed: " + error.message
+        : "Signed out successfully.";
+    };
+  }
+</script>
+</body>
+</html>
