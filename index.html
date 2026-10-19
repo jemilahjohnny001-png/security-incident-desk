@@ -101,7 +101,8 @@
         async function loadIncidents() {
             const tbody = document.getElementById('incidents-table-body');
             const { data, error } = await supabase.from('incidents').select('*').order('created_at', { ascending: false });
-            
+            console.log('Supabase load result:', { data, error });
+console.log('Incidents table element found:', !!tbody);
             if (error) {
                 console.error('Error fetching incidents:', error);
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Error loading database records.</td></tr>`;
