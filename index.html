@@ -1,342 +1,165 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Security Incident Desk</title>
-<style>
-:root{--navy:#10213b;--blue:#2563eb;--bg:#f3f6fb;--white:#fff;--text:#182438;--muted:#66758a;--border:#dfe6ef}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
-header{background:var(--navy);color:white;padding:24px 18px}
-header h1{margin:0 0 7px;font-size:25px}
-header p{margin:0;color:#d4deef;font-size:14px}
-main{max-width:1100px;margin:22px auto;padding:0 14px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.card,.panel{background:white;border:1px solid var(--border);border-radius:12px;padding:16px}
-.stat-label{font-size:13px;color:var(--muted)}
-.stat-number{font-size:28px;font-weight:bold;margin-top:8px}
-.panel{margin-bottom:20px}
-h2{font-size:19px;margin:0 0 16px}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field.full{grid-column:1/-1}
-label{font-size:13px;font-weight:bold}
-input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:7px;font:inherit;background:white;color:var(--text)}
-textarea{min-height:85px;resize:vertical}
-button{border:0;border-radius:7px;padding:11px 14px;background:var(--blue);color:white;font-weight:bold;cursor:pointer}
-button.secondary{background:#e8eef8;color:var(--navy)}
-button.danger{background:#b42318}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:14px}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:720px}
-th,td{text-align:left;padding:11px;border-bottom:1px solid var(--border);vertical-align:top;font-size:13px}
-th{background:#f7f9fc}
-.pill{display:inline-block;padding:5px 8px;border-radius:20px;background:#e8eef8;font-size:12px}
-.pill.Critical,.pill.High{background:#fee4e2;color:#a21b14}
-.pill.Resolved{background:#dcfce7;color:#166534}
-.incident{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
-.incident h3{margin:0 0 8px;font-size:16px}
-.incident p{margin:6px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
-.muted{color:var(--muted);font-size:12px}
-.note-list{padding-left:20px;font-size:13px;line-height:1.6}
-.note-entry{display:flex;gap:8px;margin-top:9px}
-.note-entry input{flex:1;min-width:0}
-.empty{color:var(--muted);text-align:center;padding:22px}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 15px 28px}
-@media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}.form-grid,.filters{grid-template-columns:1fr}.field.full{grid-column:auto}.note-entry{flex-direction:column}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Incident Desk</title>
+    
+    <!-- Supabase JS Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Initialize Supabase -->
+    <script>
+      const SUPABASE_URL = 'https://leodtboncrsvugugqjea.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_iIhv7iCli8S230Mb6tqzng_IK4focdp';
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
+
+    <style>
+        :root {--navy:#10213b;--blue:#2563eb;--bg:#f3f6fb;--white:#fff;--text:#182438;--muted:#66758a;--border:#dfe6ef}
+        *{box-sizing:border-box}
+        body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
+        header{background:var(--navy);color:white;padding:24px 18px}
+        header h1{margin:0 0 7px;font-size:25px}
+        header p{margin:0;color:#d4deef;font-size:14px}
+        main{max-width:1100px;margin:22px auto;padding:0 14px}
+        .card, .panel{background:white;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
+        h2{font-size:19px;margin:0 0 16px}
+        .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+        .field{display:flex;flex-direction:column;gap:6px}
+        .field.full{grid-column:1/-1}
+        label{font-size:13px;font-weight:bold}
+        input, select, textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:14px}
+        button{background:var(--blue);color:white;border:none;padding:12px 20px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:12px}
+        button:hover{opacity:0.9}
+        table{width:100%;border-collapse:collapse;margin-top:10px}
+        th, td{padding:12px;text-align:left;border-bottom:1px solid var(--border);font-size:14px}
+        th{color:var(--muted);font-weight:600}
+    </style>
 </head>
 <body>
-<header>
-<h1>Security Incident Desk</h1>
-<p>Security incident reporting, assignment and response tracking</p>
-</header><nav style="background: #0b1728; padding: 10px 18px; display: flex; gap: 15px;">
-<a href="index.html" style="color: #60a5fa; text-decoration: none; font-size: 14px; font-weight: bold;">Home</a>
-<a href="dashboard-connected-test.html" style="color: #d4deef; text-decoration: none; font-size: 14px;">Connected Dashboard</a>
-</nav>
 
+    <header>
+        <h1>Security Incident Desk</h1>
+        <p>Live Enterprise Cloud Dashboard connected to Supabase</p>
+    </header>
 
-<main>
-<section class="stats">
-<div class="card"><div class="stat-label">Total Incidents</div><div class="stat-number" id="total">0</div></div>
-<div class="card"><div class="stat-label">Critical / High</div><div class="stat-number" id="urgent">0</div></div>
-<div class="card"><div class="stat-label">Open Incidents</div><div class="stat-number" id="open">0</div></div>
-<div class="card"><div class="stat-label">Resolved</div><div class="stat-number" id="resolved">0</div></div>
-</section>
-
-<section class="panel">
-<h2>Report a Security Incident</h2>
-<form id="incidentForm">
-<div class="form-grid">
-<div class="field full">
-<label for="title">Incident Title *</label>
-<input id="title" required placeholder="e.g. Unauthorized access reported">
-</div>
-<div class="field">
-<label for="category">Category</label>
-<select id="category">
-<option>Unauthorized Access</option>
-<option>Theft</option>
-<option>Suspicious Activity</option>
-<option>Safety Hazard</option>
-<option>Property Damage</option>
-<option>Cybersecurity</option>
-<option>Other</option>
-</select>
-</div>
-<div class="field">
-<label for="severity">Severity</label>
-<select id="severity">
-<option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
-</select>
-</div>
-<div class="field">
-<label for="location">Location</label>
-<input id="location" placeholder="Incident location">
-</div>
-<div class="field">
-<label for="officer">Assigned Officer</label>
-<input id="officer" placeholder="Officer's name">
-</div>
-<div class="field full">
-<label for="description">Incident Description *</label>
-<textarea id="description" required placeholder="Describe what happened"></textarea>
-</div>
-</div>
-<div class="actions">
-<button type="submit">Submit Incident</button>
-<button type="reset" class="secondary">Clear Form</button>
-</div>
-</form>
-</section>
-
-<section class="panel">
-<h2>Incident Register</h2>
-<div class="filters">
-<input id="search" placeholder="Search incidents...">
-<select id="statusFilter">
-<option value="">All statuses</option>
-<option>Open</option><option>In Progress</option><option>Resolved</option>
-</select>
-<select id="severityFilter">
-<option value="">All severities</option>
-<option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
-</select>
-</div>
-<div class="actions" style="margin:0 0 14px">
-<button type="button" id="exportBtn">Export CSV</button>
-</div>
-<div id="incidentList"></div>
-</section>
-</main>
-
-<footer>
-Security Incident Desk · Demo version · Reports are saved in this browser only.
-</footer>
-
-<script>
-const STORAGE_KEY = "securityIncidentDeskDemoV1";
-const $ = id => document.getElementById(id);
-
-let incidents = [];
-try {
-  incidents = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  if (!Array.isArray(incidents)) incidents = [];
-} catch (e) {
-  incidents = [];
-}
-
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(incidents));
-}
-
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, ch => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[ch]));
-}
-
-function dateText(value) {
-  const date = new Date(value);
-  return isNaN(date) ? String(value || "") : date.toLocaleString();
-}
-
-function addHistory(item, message) {
-  if (!Array.isArray(item.history)) item.history = [];
-  item.history.push({date:new Date().toISOString(), message});
-}
-
-function render() {
-  $("total").textContent = incidents.length;
-  $("urgent").textContent = incidents.filter(i => ["Critical","High"].includes(i.severity)).length;
-  $("open").textContent = incidents.filter(i => (i.status || "Open") !== "Resolved").length;
-  $("resolved").textContent = incidents.filter(i => i.status === "Resolved").length;
-
-  const query = $("search").value.toLowerCase().trim();
-  const status = $("statusFilter").value;
-  const severity = $("severityFilter").value;
-
-  const filtered = incidents.filter(i => {
-    const searchable = [i.id,i.title,i.category,i.location,i.description,i.assignedOfficer]
-      .join(" ").toLowerCase();
-    return (!query || searchable.includes(query))
-      && (!status || (i.status || "Open") === status)
-      && (!severity || i.severity === severity);
-  });
-
-  if (!filtered.length) {
-    $("incidentList").innerHTML = '<div class="empty">No incidents found. Submit a report to get started.</div>';
-    return;
-  }
-
-  $("incidentList").innerHTML = filtered.slice().reverse().map(i => {
-    if (!Array.isArray(i.history)) i.history = [];
-    if (typeof i.responseNotes !== "string") i.responseNotes = "";
-    const history = i.history.map(h =>
-      `<li><strong>${escapeHTML(dateText(h.date))}</strong> — ${escapeHTML(h.message)}</li>`
-    ).join("");
-
-    return `
-    <article class="incident">
-      <h3>${escapeHTML(i.title)}</h3>
-      <p class="muted">${escapeHTML(i.id)} · Reported ${escapeHTML(dateText(i.date))}</p>
-      <p><span class="pill ${escapeHTML(i.severity)}">${escapeHTML(i.severity)}</span>
-      &nbsp; <span class="pill ${escapeHTML(i.status || "Open")}">${escapeHTML(i.status || "Open")}</span></p>
-      <p><strong>Category:</strong> ${escapeHTML(i.category)}</p>
-      <p><strong>Location:</strong> ${escapeHTML(i.location || "Not specified")}</p>
-      <p><strong>Description:</strong> ${escapeHTML(i.description)}</p>
-      <p><strong>Assigned Officer:</strong> ${escapeHTML(i.assignedOfficer || "Not assigned")}</p>
-      <div class="field">
-        <label for="officer-${escapeHTML(i.id)}">Update Assigned Officer</label>
-        <input id="officer-${escapeHTML(i.id)}" value="${escapeHTML(i.assignedOfficer || "")}" placeholder="Officer's name">
-      </div>
-      <div class="field" style="margin-top:10px">
-        <label for="status-${escapeHTML(i.id)}">Update Status</label>
-        <select id="status-${escapeHTML(i.id)}">
-          ${["Open","In Progress","Resolved"].map(s => `<option ${((i.status || "Open") === s) ? "selected" : ""}>${s}</option>`).join("")}
-        </select>
-      </div>
-      <div class="actions">
-        <button type="button" onclick="updateIncident('${escapeHTML(i.id)}')">Save Updates</button>
-      </div>
-      <div class="field" style="margin-top:12px">
-        <label for="note-${escapeHTML(i.id)}">Add Response Note</label>
-        <div class="note-entry">
-          <input id="note-${escapeHTML(i.id)}" placeholder="Record an action or response">
-          <button type="button" onclick="addNote('${escapeHTML(i.id)}')">Add Note</button>
+    <main>
+        <!-- Report Incident Form -->
+        <div class="panel">
+            <h2>Report New Incident</h2>
+            <form id="incident-form">
+                <div class="form-grid">
+                    <div class="field full">
+                        <label>Incident Title</label>
+                        <input type="text" id="title" required placeholder="e.g., Unauthorized access attempt">
+                    </div>
+                    <div class="field">
+                        <label>Severity</label>
+                        <select id="severity">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Reported By</label>
+                        <input type="text" id="reported_by" required placeholder="Your name">
+                    </div>
+                    <div class="field full">
+                        <label>Description</label>
+                        <textarea id="description" rows="3" placeholder="Provide details about the incident..."></textarea>
+                    </div>
+                </div>
+                <button type="submit">Submit Incident</button>
+            </form>
         </div>
-      </div>
-      <p><strong>Response Notes:</strong></p>
-      ${i.responseNotes ? `<p>${escapeHTML(i.responseNotes).replace(/\n/g,"<br>")}</p>` : '<p class="muted">No response notes yet.</p>'}
-      <details>
-        <summary>View Response Timeline (${i.history.length} entries)</summary>
-        ${history ? `<ol class="note-list">${history}</ol>` : '<p class="muted">No timeline entries yet.</p>'}
-      </details>
-      <div class="actions">
-        <button type="button" class="danger" onclick="deleteIncident('${escapeHTML(i.id)}')">Delete Incident</button>
-      </div>
-    </article>`;
-  }).join("");
-}
 
-$("incidentForm").addEventListener("submit", event => {
-  event.preventDefault();
-  const now = new Date().toISOString();
-  const incident = {
-    id: "INC-" + Date.now().toString().slice(-8),
-    date: now,
-    title: $("title").value.trim(),
-    category: $("category").value,
-    severity: $("severity").value,
-    location: $("location").value.trim(),
-    description: $("description").value.trim(),
-    assignedOfficer: $("officer").value.trim(),
-    status: "Open",
-    responseNotes: "",
-    history: [{date:now,message:"Incident reported"}]
-  };
-  incidents.push(incident);
-  save();
-  $("incidentForm").reset();
-  render();
-  alert("Incident submitted successfully.");
-});
+        <!-- Incident List Table -->
+        <div class="panel">
+            <h2>Live Incidents Feed</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Title</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Reported By</th>
+                    </tr>
+                </thead>
+                <tbody id="incidents-table-body">
+                    <tr><td colspan="5" style="text-align:center; color:var(--muted);">Loading incidents from cloud...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
 
-function updateIncident(id) {
-  const item = incidents.find(i => i.id === id);
-  if (!item) return;
-  const newOfficer = $("officer-" + id).value.trim();
-  const newStatus = $("status-" + id).value;
-  if ((item.assignedOfficer || "") !== newOfficer) {
-    item.assignedOfficer = newOfficer;
-    addHistory(item, "Assigned officer updated to " + (newOfficer || "Not assigned"));
-  }
-  const oldStatus = item.status || "Open";
-  if (oldStatus !== newStatus) {
-    item.status = newStatus;
-    addHistory(item, "Status changed from " + oldStatus + " to " + newStatus);
-  }
-  save();
-  render();
-  alert("Incident updates saved.");
-}
+    <script>
+        // Fetch and display incidents on load
+        async function loadIncidents() {
+            const tbody = document.getElementById('incidents-table-body');
+            const { data, error } = await supabase.from('incidents').select('*').order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error fetching incidents:', error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Error loading database records.</td></tr>`;
+                return;
+            }
 
-function addNote(id) {
-  const item = incidents.find(i => i.id === id);
-  const input = $("note-" + id);
-  if (!item || !input || !input.value.trim()) {
-    alert("Please enter a response note first.");
-    return;
-  }
-  const note = input.value.trim();
-  const stamp = dateText(new Date().toISOString());
-  item.responseNotes = (item.responseNotes ? item.responseNotes + "\n" : "") + "[" + stamp + "] " + note;
-  addHistory(item, "Response note added: " + note);
-  save();
-  render();
-}
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted);">No incidents reported yet.</td></tr>`;
+                return;
+            }
 
-function deleteIncident(id) {
-  if (!confirm("Are you sure you want to delete this incident?")) return;
-  incidents = incidents.filter(i => i.id !== id);
-  save();
-  render();
-}
+            tbody.innerHTML = data.map(inc => `
+                <tr>
+                    <td>${new Date(inc.created_at).toLocaleString()}</td>
+                    <td><strong>${escapeHtml(inc.title)}</strong></td>
+                    <td><span style="padding:4px 8px; border-radius:4px; font-size:12px; background:${getSeverityColor(inc.severity)}; color:white;">${inc.severity}</span></td>
+                    <td>${inc.status || 'Open'}</td>
+                    <td>${escapeHtml(inc.reported_by || 'Unknown')}</td>
+                </tr>
+            `).join('');
+        }
 
-function csvCell(value) {
-  return '"' + String(value ?? "").replace(/"/g, '""') + '"';
-}
+        // Handle form submission
+        document.getElementById('incident-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const severity = document.getElementById('severity').value;
+            const reported_by = document.getElementById('reported_by').value;
+            const description = document.getElementById('description').value;
 
-$("exportBtn").addEventListener("click", () => {
-  if (!incidents.length) {
-    alert("There are no incidents to export.");
-    return;
-  }
-  const headers = ["ID","Date","Title","Category","Severity","Location","Description","Assigned Officer","Status","Response Notes","Timeline"];
-  const rows = incidents.map(i => [
-    i.id,i.date,i.title,i.category,i.severity,i.location,i.description,
-    i.assignedOfficer,i.status,i.responseNotes,
-    (i.history || []).map(h => dateText(h.date) + " - " + h.message).join(" | ")
-  ]);
-  const csv = [headers,...rows].map(row => row.map(csvCell).join(",")).join("\r\n");
-  const blob = new Blob(["\uFEFF" + csv], {type:"text/csv;charset=utf-8;"});
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "security-incidents.csv";
-  link.click();
-  URL.revokeObjectURL(url);
-});
+            const { error } = await supabase.from('incidents').insert([{ title, severity, reported_by, description }]);
 
-["search","statusFilter","severityFilter"].forEach(id => {
-  $(id).addEventListener("input", render);
-  $(id).addEventListener("change", render);
-});
+            if (error) {
+                alert('Error saving incident: ' + error.message);
+            } else {
+                alert('Incident successfully logged to Supabase cloud!');
+                document.getElementById('incident-form').reset();
+                loadIncidents();
+            }
+        });
 
-render();
-</script>
+        function getSeverityColor(sev) {
+            switch(sev) {
+                case 'Critical': return '#dc2626';
+                case 'High': return '#ea580c';
+                case 'Medium': return '#d97706';
+                default: return '#2563eb';
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Load data when page opens
+        loadIncidents();
+    </script>
 </body>
 </html>
+
