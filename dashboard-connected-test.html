@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Incident Desk - Connected Test</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{font-family:Arial,sans-serif;background:#f1f5f9;color:#172554;padding:20px}
+main{max-width:600px;margin:20px auto;background:white;padding:22px;border-radius:12px}
+input,button{box-sizing:border-box;width:100%;padding:12px;margin:7px 0}
+button{background:#17365d;color:white;border:0;border-radius:6px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<h1>Security Incident Desk</h1>
+<h2>Connected Dashboard Test</h2>
+<p id="status">Ready to connect.</p>
+<form id="login">
+<input id="email" type="email" placeholder="Your account email" required>
+<input id="password" type="password" placeholder="Your password" required>
+<button type="submit">Sign In</button>
+</form>
+<button id="load">Load Incident Records</button>
+<button id="logout">Sign Out</button>
+<pre id="results">No records loaded yet.</pre>
+</main>
+<script>
+const URL="https://leodtboncrsvugugqjea.supabase.co";
+const KEY="sb_publishable_iIhv7iCli8S230Mb6tqzng_IK4focdp";
+const db=window.supabase.createClient(URL,KEY);
+const statusBox=document.getElementById("status");
+const results=document.getElementById("results");
+
+async function checkLogin(){
+ const {data,error}=await db.auth.getUser();
+ if(error||!data.user){
+  statusBox.textContent="Please sign in to continue.";
+  return false;
+ }
+ statusBox.textContent="Signed in as "+data.user.email;
+ return true;
+}
+
+document.getElementById("login").onsubmit=async(e)=>{
+ e.preventDefault();
+ statusBox.textContent="Signing in...";
+ const {error}=await db.auth.signInWithPassword({
+  email:document.getElementById("email").value.trim(),
+  password:document.getElementById("password").value
+ });
+ if(error){statusBox.textContent="Sign-in failed: "+error.message;return;}
+ await checkLogin();
+};
+
+document.getElementById("load").onclick=async()=>{
+ results.textContent="Please wait...";
+ if(!await checkLogin()){
+  results.textContent="Please sign in first.";
+  return;
+ }
+ const {data,error}=await db.from("incidents").select("*").limit(20);
+ if(error){
+  statusBox.textContent="Could not load records.";
+  results.textContent=error.message;
+  return;
+ }
+ statusBox.textContent="Database connection successful!";
+ results.textContent=data.length
+  ?JSON.stringify(data,null,2)
+  :"Connected successfully. No incident records were found.";
+};
+
+document.getElementById("logout").onclick=async()=>{
+ const {error}=await db.auth.signOut();
+ statusBox.textContent=error?"Sign-out failed: "+error.message:"Signed out successfully.";
+ results.textContent="";
+};
+
+checkLogin();
+</script>
+</body>
+</html>
